@@ -1,39 +1,46 @@
-const express = require('express')
-const app = express()
-const port = 3000
+const express = require('express');
+const app = express();
+const port = 3000;
+const cors = require('cors');
 
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
-function llamadoDistancia(origen, destino,transporteTipo){
+function llamadoDistancia() {
   return Math.random() * (1000 - 10) + 10;
 }
 
-function llamadoTiempo(origen, destino,transporteTipo){
-  tiempo= Math.random() * (100 - 10) + 10;
-  if(transporte='Aereo'){
-
-    tiempo=tiempo/100;
+function llamadoTiempo(transporte) {
+  let tiempo = Math.random() * 100;
+  if (transporte == 'Aereo') {
+    tiempo = tiempo / 100;
+  } else if (transporte == 'Maritimo') {
+    tiempo = tiempo / 10;
   }
-  else if(transporte='Maritimo'){
-    tiempo=tiempo/10;
-  }
-
-  return tiempo;
-
+  return Math.floor(tiempo);
 }
 
-app.post('/transporte', (req, res) => {
-  body=req.body;
-  distanciaRecorrido = llamadoDistancia(body.origen, body.destino, body.transporteTipo);
-  tiempoRecorrido = llamadoTiempo(body.origen, body.destino,body.transporteTipo);
-  transporteUsado=body.transporteTipo;
+app.post('/transporte', cors(), (req, res) => {
+  body = req.body;
+  distanciaRecorrido = llamadoDistancia(
+    body.origen,
+    body.destino,
+    body.transporteTipo
+  );
+  tiempoRecorrido = llamadoTiempo(
+    body.origen,
+    body.destino,
+    body.transporteTipo
+  );
+  transporteUsado = body.transporteTipo;
   res.send({
-    distanciaRecorrido,tiempoRecorrido, transporteUsado
-  })
-
-})
+    distanciaRecorrido: `${distanciaRecorrido} km`,
+    tiempoRecorrido: `${tiempoRecorrido} s`,
+    transporteUsado,
+  });
+});
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+  console.log(`Example app listening at http://localhost:${port}`);
+});
